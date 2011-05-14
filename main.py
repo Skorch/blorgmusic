@@ -26,7 +26,7 @@ django.dispatch.Signal.disconnect(
     django.db._rollback_on_exception)
 
 
-
+ 
 def main():
   # Create a Django application for WSGI.
   application = django.core.handlers.wsgi.WSGIHandler()
