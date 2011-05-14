@@ -1,0 +1,86 @@
+div.wrap {
+    clear:both;
+    width:930px;
+    margin:0 auto;
+    position:relative;
+}
+#songqueue{
+    overflow:scroll;
+}
+
+
+div #songplayer{
+    width:300px;
+    position:absolute;
+    top:20px;
+    background:#aaa;
+    border:1px solid #666;
+
+
+}
+div.player{
+    float:left;
+    padding: 10px;
+
+}
+
+div.contents{
+
+    float:right;
+    padding:10px;
+    width:540px;
+    vertical-align:top;
+}
+
+div.nowplaying-text{
+    font-weight:bold;;
+}
+
+ul.musicstream li {
+ /* assume all items will be sounds rather than wait for onload etc. in this example.. may differ for your uses. */
+ position:relative;
+ display:block;
+ width:auto;
+ font-size:1.6em;
+ color:#666;
+ padding:0.25em 0.5em 0.25em 0.5em;
+ border:none;
+ letter-spacing:-1px; /* ZOMG WEB X.0. ;) */
+ background-color:#f9f9f9;
+ -webkit-transition-property: hover;
+ -webkit-transition: background-color 0.15s ease-in-out;
+ -moz-transition: background-color 0.15s linear 0s; /* firefox 4 */
+  -o-transition-property: background-color; /* opera 10.5 */
+  -o-transition-duration: 0.15s;
+
+}
+
+ul.musicstream li a {
+ display:block;
+ text-decoration:none;
+ font-weight:normal;
+ color:#000;
+ font-size:120%;
+ outline:none;
+ position:relative;
+ z-index:2;
+}
+
+
+ul.musicstream li:hover {
+ background-color:#eee;
+}
+
+ul.musicstream li:hover a {
+ color:#555;
+}
+
+#sm2-container {
+  /* for testing... */
+  border: 1px solid red;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 8px;
+  height: 8px;
+}

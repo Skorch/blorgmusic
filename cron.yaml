@@ -1,0 +1,4 @@
+cron: 
+- description: Send nightly reports.
+  url: /parsetwitter/
+  schedule: every 30 minutes 

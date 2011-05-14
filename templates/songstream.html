@@ -1,0 +1,18 @@
+<div class="songstream" page="{{ currentpage }}" size="{{ pagesize }}" source="{{ source }}" datalength="{{ datalength }}" moredata="{{ moredata }}">
+<ul class="pagecontrols">
+    {% if currentpage > 1 %}
+    <li><a id="songstreamprev" href="#" onclick="getSongStream('prev', null, null, null);">previous page</a></li>
+    {% endif %}
+    {% if moredata %}
+    <li><a id="songstreamnext" href="#" onclick="getSongStream('next', null, null, null);">next page</a></li>
+    {% endif %}
+
+</ul>
+    <ul id="musicstream" class="musicstream">
+    {% for songitem in songlist %}
+
+        {% include "songitem.html" %}
+
+    {% endfor %}
+    </ul>
+</div>
