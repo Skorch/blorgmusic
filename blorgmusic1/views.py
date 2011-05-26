@@ -1,9 +1,6 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from BlorgMusicData import models
-from BlorgMusicData.dao import *
+from BlorgMusicData.dao import Dao
 from BlorgMusicHelper.stringhelper import *
 from django.shortcuts import render_to_response
-import logging
 
 def render(request):
     #TODO:  convert this into a fully RESTful syntax
@@ -19,16 +16,16 @@ def render(request):
         size = int(sizeStr)
     else:
         size = 50
-    songPostListResult = fetchSongPostList(sourceStr, pageNumber, size)
+    songPostListResult =  Dao.fetchSongPostList(sourceStr, pageNumber, size)
     payload = dict()
     #payload['javascriptSongList'] = javascriptBuilder.buildSongPlaylist(songPostList)
     payload['songlist'] = songPostListResult['songList']
     payload['datalength'] = songPostListResult['dataLength']
-    payload['moredata'] = (songPostListResult['dataLength'] > (pageNumber)*size)
+    payload['moredata'] = (songPostListResult['dataLength'] > pageNumber *size)
     payload['currentpage'] = pageNumber
     payload['pagesize'] = size
     payload['sourcekey'] = sourceStr
-    payload['sourcelist'] = fetchSourceList()
+    payload['sourcelist'] = Dao.fetchSourceList()
     return render_to_response('index.html', payload)
 
 

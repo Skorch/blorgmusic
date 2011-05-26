@@ -3,6 +3,12 @@ version: 5
 runtime: python
 api_version: 1
 
+builtins:
+- remote_api: on
+
+inbound_services:
+- warmup
+
 handlers:
 - url: /media
   static_dir: media
@@ -10,6 +16,10 @@ handlers:
 - url: /parsesongdata/*
   script: BlorgMusicIngestPipeline/parsesongdata.py
 
-- url: .*
-  script: main.py
+- url: /.*
+  script: djangoappengine/main/main.py
+
+
+#- url: .*
+#  script: main.py
 

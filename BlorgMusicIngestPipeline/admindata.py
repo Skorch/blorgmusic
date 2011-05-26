@@ -4,6 +4,7 @@ from google.appengine.api import urlfetch
 from google.appengine.ext.webapp.util import run_wsgi_app
 from datetime import datetime, date, time
 import re
+from BlorgMusicData.dao import Dao
 from BlorgMusicHelper.stringhelper import  *
 from BlorgMusicData.models import *
 from django.http import HttpResponse, HttpResponseRedirect
@@ -11,7 +12,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 
 def main(request):
-    datalist = ParseItem.all()
+    datalist = Dao.ParseItem_GetListAll()
+    
     htmlOutput = '''
         <html>
             <head>
@@ -29,6 +31,7 @@ def main(request):
             '''
     formNumber = 0
     for item in datalist:
+        
         htmlOutput += '''
         <p>
         <form id="form_%(formnumber)s" class="songadmin" name="update_song" method="get" action="/updatesongdata/">

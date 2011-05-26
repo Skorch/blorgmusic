@@ -1,10 +1,6 @@
-from django.http import HttpResponse, HttpResponseRedirect
-#sys.path.append('py')
-from BeautifulSoup.beautifulsoup import BeautifulSoup
-from google.appengine.ext import webapp
+from BlorgMusicData.dao import Dao
+from django.http import HttpResponse
 from google.appengine.api import urlfetch
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
 from google.appengine.api.taskqueue import taskqueue
 import re
 import logging
@@ -15,23 +11,16 @@ from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
 def generateTaskName(url, source):
-    path = url.path.replace('/', '')
+    path = url.path.replace('/', '').replace('~', '')
     host = url.hostname.replace('.', '')
-#        logging.info('combined parth: %(1)s-%(2)s' % {'1':host,'2':path})
+
     return ('%(host)s-%(path)s-%(source)s' % {'host':host, 'path':path, 'source': source})[-500:]
 
 def main(request):
 
     reLink = re.compile("((https?|ftp|file):\/\/[\-A-Z0-9+&@#\/%?=~_|!:,.;]*[\-A-Z0-9+&@#\/%=~_|])",re.IGNORECASE)
-    parseUrlList = DataSource.all()
+    parseUrlList = Dao.DataSource_GetListAll()
 
-#        parseUrlList = [
-#                        DataSource(SourceName='twitter', SourceUrl='http://api.twitter.com/1/evilnohear/lists/all-music/statuses.xml')
-#                        ,DataSource(SourceName='twitter-electronic', SourceUrl='http://api.twitter.com/1/evilnohear/lists/electronic-blogs/statuses.xml')
-#                        ,DataSource(SourceName='twitter-indie', SourceUrl='http://api.twitter.com/1/evilnohear/lists/indie-blogs/statuses.xml')
-#                        ] #MusicSource.all()
-#        for item in parseUrlList:
-#            item.put()
 
     errorOutput = ''
 #        logging.info('Starting to fetch items from Twitter: %s items' % parseUrlList.count())
@@ -40,7 +29,7 @@ def main(request):
         logging.info('fetching twitter feed: %s' % parseUrl.SourceUrl)
         try:
             page = urlfetch.fetch(parseUrl.SourceUrl, headers = {'Cache-Control' : 'max-age=0'})
-
+            logging.info(page)
             if page.status_code == 200:
                 statusList = []
                 try:

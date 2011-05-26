@@ -1,11 +1,8 @@
 import logging
-from BlorgMusicData.dao import fetchSongPostList
-from BlorgMusicHelper.stringhelper import *
 from BlorgMusicHandler.jsonresponse import *
-from BlorgMusicData.models import *
-from BlorgMusicData.dao import *
+from BlorgMusicData.dao import Dao
+from BlorgMusicHelper.stringhelper import str2none
 from django.template.loader import render_to_string
-
 
 
 class BlorgMusicServices(JsonWebService):
@@ -13,11 +10,10 @@ class BlorgMusicServices(JsonWebService):
     @JsonWebService.jsonresponse()
     def ArtistSongs(self, request):
         artistKey = request.GET.get('artistkey').strip()
-        artistItem = ArtistItem.get(artistKey)
-        if artistItem:
-            return self.db2dict(artistItem.PrimarySongs.fetch(3))
-        else:
-            return None
+        artistItem = Dao.GetArtistItem(artistKey)
+
+        #TODO:  use python model-JSON serializer
+        return None
 
     @JsonWebService.jsonresponse()
     def SongStream(self, request):
@@ -37,17 +33,8 @@ class BlorgMusicServices(JsonWebService):
 
         return self.render_musicstream(sourceStr, pageNumber, size)
 
-    def db2dict(self, result):
-        if isinstance(result, list):
-            resultList = []
-            for resultItem in result:
-                resultList.append( to_dict(resultItem) )
-            return resultList
-        else:
-            return result
-
     def render_musicstream(self, sourceStr, pageNumber, size):
-        songPostListResult = fetchSongPostList(sourceStr, pageNumber, size)
+        songPostListResult = Dao.fetchSongPostList(sourceStr, pageNumber, size)
         payload = dict()
         #payload['javascriptSongList'] = javascriptBuilder.buildSongPlaylist(songPostList)
         payload['songlist'] = songPostListResult['songList']

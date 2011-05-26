@@ -1,26 +1,7 @@
             <li>
-                <div class="songitem-abridged" id="songitem-{{ forloop.counter0 }}" songkey="{{ songitem.key }}">
-                    <a href="{{ songitem.SongUrl }}" class="songitem" artistkey="{{ songitem.CanonicalSong.SongArtist.key }}">
-                        {{ songitem.CanonicalSong.SongArtist.Name }}
-                        {% if songitem.CanonicalSong.FeaturingArtist %}
-                            &nbsp;(ft {{ songitem.CanonicalSong.FeaturingArtist.Name }})
-                        {% endif %}
-                        &nbsp;-&nbsp;
-                        {{ songitem.CanonicalSong.SongTitle }}
-                        {% if songitem.CanonicalSong.RemixArtist %}
-                            &nbsp;({{ songitem.CanonicalSong.RemixArtist.Name }} Remix)
-                        {% endif %}
-                        {% if songitem.CanonicalSong.OriginalArtist %}
-                            &nbsp;({{ songitem.CanonicalSong.OriginalArtist.Name }} Cover)
-                        {% endif %}
-                        {% if songitem.CanonicalSong.SongNotes %}
-                            &nbsp;({{ songitem.CanonicalSong.SongNotes }})
-                        {% endif %}
-<!--
-                        {% if songitem.CanonicalSong.IsMashup %}
-                            &nbsp;(Mashup)
-                        {% endif %}
--->
+                <div class="songitem-abridged" id="songitem-{{ forloop.counter0 }}" songkey="{{ songitem.id }}">
+                    <a href="{{ songitem.SongUrl }}" class="songitem" >
+                        {{ songitem.CanonicalSong.FormattedSongTitle }}
                     </a>
                     {{ songitem.Blog.Blog.BlogUrl }}
                 </div>

@@ -1,23 +1,20 @@
-"""
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
 
-Replace these with more appropriate tests for your application.
-"""
+__author__ = 'abeaupre'
 
+from BlorgMusicData.dao import *
+from BlorgMusicData.daohelper import *
 from django.test import TestCase
+from BlorgMusicIngestPipeline import *
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.failUnlessEqual(1 + 1, 2)
+class DataItemTest(TestCase):
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
+    def test_fetchData(self):
+        blogItem = Dao.BlogSource_GetOrInsert('http://www.indieshuffle.com', 'Indie Shuffle')
+        blogPostUrl = 'http://www.indieshuffle.com/#:/the-cure-lovesong-diplo-remix/'
+        blogPostItem = Dao.BlogPost_GetOrInsert(blogPostUrl, 'Test', blogItem)
+        dataSource = 'unknown'
+        fetchdata.fetchSongData(blogPostUrl, dataSource)
 
->>> 1 + 1 == 2
-True
-"""}
+        blogPostItem = Dao.BlogPost_Get(blogPostUrl)
 
+        self.assertTrue(blogPostItem)

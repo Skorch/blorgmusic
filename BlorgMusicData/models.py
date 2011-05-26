@@ -1,108 +1,110 @@
 __author__ = 'abeaupre'
-from appengine_django.models import BaseModel
-from google.appengine.ext import db
+from django.db import models
 
-#Depricated - needs to be converted into the new structure
-class MusicItem(db.Model):
-    Url = db.StringProperty()
-    Source = db.StringProperty()
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
-    SongArtist = db.StringProperty() #the main artist for the current song
-    SongTitle = db.StringProperty() #the title of the current song
-    SourcelUrl = db.StringProperty()
-
-    #the following should be references to an Artist object
-    #for the moment, store the raw string
-    RemixArtist = db.StringProperty() #remixed by
-    OriginalAtist = db.StringProperty() #cover song
-    MashupArtist = db.StringProperty() #This should be a string list
-    FeaturingArtist = db.StringProperty() #featuring another artist
-
-    OriginalText = db.StringProperty() #the original text around the link
 
 
 #New canonical Structure
-class ArtistItem(db.Model):
-    Name = db.StringProperty(required=True)
-    HasRemix = db.BooleanProperty(default=False)
-    HasMashup = db.BooleanProperty(default=False)
-    HasCover = db.BooleanProperty(default=False)
-    HasFeaturing = db.BooleanProperty(default=False)
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
+class ArtistItem(models.Model):
+    Name = models.CharField(blank=False, null=False, max_length=50)
+    HasRemix = models.BooleanField(blank=False, null=False)
+    HasMashup = models.BooleanField(blank=False, null=False)
+    HasCover = models.BooleanField(blank=False, null=False)
+    HasFeaturing = models.BooleanField(blank=False, null=False)
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1) 
+
+    def __str__(self):
+        return self.Name
+
+class SongArtistRoleList(models.Model):
+    SONGARTISTROLECHOICES = (
+        ('P', 'Primary'),
+        ('R', 'Remix'),
+        ('F', 'Featuring'),
+        ('O', 'Original'),
+        ('M', 'Mashup'),
+    )
+    Song = models.ForeignKey('SongItem')
+    Artist = models.ForeignKey('ArtistItem')
+    Role = models.CharField(blank=False, null=False, choices=SONGARTISTROLECHOICES, max_length=20)
+
+class SongItem(models.Model):
+    SongKey = models.CharField(blank=False, null=False, max_length=50) #a normalized version of the song name
+    PrimaryArtist = models.ForeignKey('ArtistItem', null=False, blank=False)
+    SongTitle = models.TextField(blank=False, null=False) #the title of the current song
+    FormattedSongTitle = models.TextField(blank=False, null=False) #the de-normalized representation of the song title including all artists
+#TODO:  Expand on this:  include isRemix, isCover, etc
+#    IsMashup = models.BooleanField(default=False, null=False, blank=False)
+    SongNotes = models.TextField(blank=True, null=True) #other misc info in (brackets)
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
+
+    ArtistRoleList = []
+
+    def __str__(self):
+        return self.SongTitle
 
 
-class SongItem(db.Model):
-    SongKey = db.StringProperty() #a normalized version of the song name
-    SongTitle = db.StringProperty() #the title of the current song
-    SongArtist = db.ReferenceProperty(ArtistItem, collection_name="PrimarySongs") #the main artist for the current song
-    RemixArtist = db.ReferenceProperty(ArtistItem, collection_name="RemixSongs") #remixed by
-    OriginalArtist = db.ReferenceProperty(ArtistItem, collection_name="OriginalSongs") #cover song
-    IsMashup = db.BooleanProperty(default=False)
-    FeaturingArtist = db.ReferenceProperty(ArtistItem, collection_name="FeaturingSongs") #featuring another artist
-    SongNotes = db.StringProperty() #other misc info in (brackets)
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
+class DataSource(models.Model):
+    SourceName = models.CharField(blank=False, null=False, max_length=50)
+    SourceUrl = models.CharField(blank=False, null=False, max_length=256)
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
 
+class BlogSource(models.Model):
+    BlogName = models.CharField(blank=False, null=False, max_length=50)
+    BlogUrl = models.CharField(blank=False, null=False, max_length=256)
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
 
-class DataSource(BaseModel):
-    SourceName = db.StringProperty(required=True)
-    SourceUrl = db.StringProperty(required=True)
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
+class BlogPost(models.Model):
+    PostUrl = models.CharField(blank=False, null=False, max_length=256)
+    Summary = models.TextField(blank=False, null=False)
+    Blog = models.ForeignKey('BlogSource')
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
 
-class BlogSource(db.Model):
-    BlogName = db.StringProperty(required=True)
-    BlogUrl = db.StringProperty(required=True)
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
+class SongPost(models.Model):
+    SongUrl = models.CharField(blank=False, null=False, max_length=256)
+    CanonicalSong = models.ForeignKey('SongItem')
+    Blog = models.ForeignKey('BlogPost')
+    OriginalText = models.TextField(blank=True, null=True)
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
 
-class BlogPost(db.Model):
-    PostUrl = db.StringProperty(required=True)
-    Summary = db.StringProperty()
-    Blog = db.ReferenceProperty(BlogSource, collection_name="BlogPosts")
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
+class SongPostDataSourceList(models.Model):
+    SongPost = models.ForeignKey('SongPost')
+    DataSource = models.ForeignKey('DataSource')
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
 
-class SongPost(db.Model):
-    SongUrl = db.StringProperty() #not required!  Support the ability to show blog posts where we couldn't strip the mp3 from
-    CanonicalSong = db.ReferenceProperty(SongItem, collection_name="SongPosts")
-    Blog = db.Reference(BlogPost, collection_name="BlogPosts")
-    OriginalText = db.StringProperty() #the original text around the link
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
-    DataVersion = db.IntegerProperty(default=1)
+class ParseItem(models.Model):
 
-class SongPostDataSourceList(db.Model):
-    SongPost = db.ReferenceProperty(SongPost, collection_name="DataSourceList")
-    DataSource = db.ReferenceProperty(DataSource, collection_name="SongPostList")
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
+    InputString = models.CharField(null=False, blank=False, unique=True, max_length=256) #the original string from the web page
+#    SongArtist = models.CharField() #the main artist for the current song
+#    SongTitle = models.CharField() #the title of the current song
+#    RemixArtist = models.CharField() #remixed by
+#    OriginalArtist = models.CharField() #cover song
+#    SongNotes = models.CharField() #other misc info in (brackets)
+#    FeaturingArtist = models.CharField() #featuring another artist
+#    IsMashup = models.BooleanField(default=False) #is this a mashup?
+#    ParseSuccessful = models.BooleanField(default=False) #was this item successfully parsed
+    CreateTime = models.DateTimeField(auto_now_add=True)
+    ModifyTime = models.DateTimeField(auto_now_add=True, auto_now=True)
+    DataVersion = models.IntegerField(blank=False, null=False, default=1)
 
-class ParseItem(db.Model):
-    InputString = db.StringProperty(required=True) #the original string from the web page
-    SongArtist = db.StringProperty() #the main artist for the current song
-    SongTitle = db.StringProperty() #the title of the current song
-    RemixArtist = db.StringProperty() #remixed by
-    OriginalArtist = db.StringProperty() #cover song
-    SongNotes = db.StringProperty() #other misc info in (brackets)
-    FeaturingArtist = db.StringProperty() #featuring another artist
-    IsMashup = db.BooleanProperty(default=False) #is this a mashup?
-    ParseSuccessful = db.BooleanProperty(default=False) #was this item successfully parsed
-    CreateTime = db.DateTimeProperty(auto_now_add=True)
-    ModifyTime = db.DateTimeProperty(auto_now=True)
+    Url = models.TextField()
+    SourceUrl = models.TextField()
 
-    Url = db.StringProperty()
-    SourceUrl = db.StringProperty()
-
-class ParseItemSourceList(db.Model):
-    Parse = db.ReferenceProperty(ParseItem, collection_name="ParseItemSources")
-    SourceItem = db.ReferenceProperty(DataSource, collection_name="ParseItems")
+class ParseItemSourceList(models.Model):    
+    Parse = models.ForeignKey('ParseItem')
+    SourceItem = models.ForeignKey('DataSource')
 
       

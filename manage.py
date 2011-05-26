@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 from django.core.management import execute_manager
-from appengine_django import InstallAppengineHelperForDjango
-
-InstallAppengineHelperForDjango()
-
-
 try:
     import settings # Assumed to be in the same directory.
 except ImportError:
